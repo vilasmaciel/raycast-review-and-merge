@@ -24,18 +24,73 @@ const CHECKS_ACCESSORY: Record<string, List.Item.Accessory> = {
   },
 };
 
-export function pullRequestStateIcon(pr: PullRequest): Image.ImageLike {
+interface PullRequestStatus {
+  icon: Image.ImageLike;
+  text: string;
+}
+
+/** The PR's status: a GitHub-style pull-request glyph and its label. */
+export function pullRequestStatus(pr: PullRequest): PullRequestStatus {
   if (pr.isDraft) {
-    return { source: Icon.CircleEllipsis, tintColor: Color.SecondaryText };
+    return {
+      icon: {
+        source: "pull-request-draft.svg",
+        tintColor: Color.SecondaryText,
+      },
+      text: "Draft",
+    };
   }
   switch (pr.state) {
     case "MERGED":
-      return { source: Icon.CheckCircle, tintColor: Color.Purple };
+      return {
+        icon: { source: "pull-request-merged.svg", tintColor: Color.Purple },
+        text: "Merged",
+      };
     case "CLOSED":
-      return { source: Icon.XMarkCircle, tintColor: Color.Red };
+      return {
+        icon: { source: "pull-request-closed.svg", tintColor: Color.Red },
+        text: "Closed",
+      };
     default:
-      return { source: Icon.Circle, tintColor: Color.Green };
+      return {
+        icon: { source: "pull-request-open.svg", tintColor: Color.Green },
+        text: "Open",
+      };
   }
+}
+
+/** List.Item leading icon for a PR, including a "Status: …" tooltip. */
+export function pullRequestStateIcon(pr: PullRequest): {
+  value: Image.ImageLike;
+  tooltip: string;
+} {
+  const status = pullRequestStatus(pr);
+  return { value: status.icon, tooltip: `Status: ${status.text}` };
+}
+
+const REVIEW_DECISION_ACCESSORY: Record<string, List.Item.Accessory> = {
+  APPROVED: {
+    icon: { source: Icon.CheckCircle, tintColor: Color.Green },
+    tooltip: "Approved",
+  },
+  CHANGES_REQUESTED: {
+    icon: { source: Icon.Pencil, tintColor: Color.Orange },
+    tooltip: "Changes requested",
+  },
+  REVIEW_REQUIRED: {
+    icon: { source: Icon.Eye, tintColor: Color.Yellow },
+    tooltip: "Review required",
+  },
+};
+
+/** Review decision shown as a compact tinted icon (open PRs only). */
+export function reviewDecisionAccessories(
+  pr: PullRequest,
+): List.Item.Accessory[] {
+  if (pr.state !== "OPEN" || !pr.reviewDecision) {
+    return [];
+  }
+  return [REVIEW_DECISION_ACCESSORY[pr.reviewDecision]];
 }
 
 export function authorAccessory(pr: PullRequest): List.Item.Accessory {
@@ -76,18 +131,7 @@ export function pullRequestAccessories(pr: PullRequest): List.Item.Accessory[] {
     accessories.push(CHECKS_ACCESSORY[pr.checksState]);
   }
 
-  if (pr.state === "OPEN" && pr.reviewDecision) {
-    const reviews: Record<string, List.Item.Accessory> = {
-      APPROVED: { tag: { value: "Approved", color: Color.Green } },
-      CHANGES_REQUESTED: {
-        tag: { value: "Changes requested", color: Color.Red },
-      },
-      REVIEW_REQUIRED: {
-        tag: { value: "Review required", color: Color.Orange },
-      },
-    };
-    accessories.push(reviews[pr.reviewDecision]);
-  }
+  accessories.push(...reviewDecisionAccessories(pr));
 
   if (pr.state !== "OPEN") {
     accessories.push(

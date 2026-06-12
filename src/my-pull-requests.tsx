@@ -10,6 +10,7 @@ import {
   autoMergeAccessories,
   checksAccessories,
   pullRequestStateIcon,
+  reviewDecisionAccessories,
 } from "./components/accessories";
 import { getSearchScope } from "./preferences";
 
@@ -42,8 +43,9 @@ function MyPullRequests() {
               subtitle={`#${pr.number}`}
               icon={pullRequestStateIcon(pr)}
               accessories={[
-                ...autoMergeAccessories(pr),
                 ...checksAccessories(pr),
+                ...autoMergeAccessories(pr),
+                ...reviewDecisionAccessories(pr),
               ]}
             />
           ))}
