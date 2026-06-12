@@ -1,4 +1,6 @@
 import { List } from "@raycast/api";
+import { withAccessToken } from "@raycast/utils";
+import { github } from "./github/auth";
 import { usePullRequestSearch } from "./github/usePullRequests";
 import { myOpenPullRequestsQuery } from "./lib/searchQueries";
 import { groupByRepo, shortRepoName } from "./lib/groupByRepo";
@@ -9,11 +11,11 @@ import {
   checksAccessories,
   pullRequestStateIcon,
 } from "./components/accessories";
-import { getOrganization } from "./preferences";
+import { getSearchScope } from "./preferences";
 
-export default function MyPullRequests() {
+function MyPullRequests() {
   const { data, isLoading, error, revalidate } = usePullRequestSearch(
-    myOpenPullRequestsQuery(getOrganization()),
+    myOpenPullRequestsQuery(getSearchScope()),
   );
 
   if (error) {
@@ -54,3 +56,5 @@ export default function MyPullRequests() {
     </List>
   );
 }
+
+export default withAccessToken(github)(MyPullRequests);

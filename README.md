@@ -1,6 +1,6 @@
 # Review & Merge
 
-A local [Raycast](https://raycast.com) extension to review and merge GitHub pull requests fast: list your own PRs and your review requests, approve, and merge or enable auto-merge — each in one click.
+Review and merge GitHub pull requests fast: list your own PRs and your review requests, approve, and merge or enable auto-merge — each in one click.
 
 It's organization-agnostic: by default it covers every pull request you have access to across GitHub, and you can optionally scope it to a single org or owner.
 
@@ -19,25 +19,8 @@ It's organization-agnostic: by default it covers every pull request you have acc
 
 ## Setup
 
-This is a local (unpublished) extension.
+Sign in with your GitHub account on first use. The extension requests only the scopes it needs to list, approve, and merge pull requests.
 
-1. Install dependencies and run it in development mode:
-   ```bash
-   npm install
-   npm run dev
-   ```
-   This registers the extension in Raycast and keeps it hot-reloading. Alternatively, in Raycast run **Import Extension** and point it at this folder.
-2. On first use, Raycast prompts for preferences:
-   - **GitHub Personal Access Token** (required) — a token with the `repo` scope and access to the repositories whose pull requests you want to see. Either a classic PAT with `repo`, or a fine-grained PAT with Pull requests read & write and Contents read & write. Stored in Raycast's encrypted preferences.
-   - **Organization or Owner** (optional) — limit results to a single GitHub org/owner. Leave empty to include all your pull requests across GitHub.
+If you prefer, you can instead provide a **Personal Access Token** in the extension preferences (a classic PAT with the `repo` scope, or a fine-grained PAT with **Pull requests** read & write and **Contents** read & write).
 
-## Development
-
-```bash
-npm test         # unit tests (vitest) for query builders, merge rules, mapper, dedupe
-npm run build    # ray build
-npm run lint     # ray lint (ESLint + Prettier + manifest validation)
-npm run fix-lint # auto-fix lint issues
-```
-
-The pure logic in `src/lib/` and the GraphQL contract are unit-tested; the React/Raycast UI and the approve/merge mutations are verified manually with `npm run dev`.
+You can optionally set **Organization or Owner** in preferences to limit results to a single GitHub org/owner. Leave it empty to include all your pull requests across GitHub.

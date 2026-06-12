@@ -1,4 +1,6 @@
 import { List } from "@raycast/api";
+import { withAccessToken } from "@raycast/utils";
+import { github } from "./github/auth";
 import { useReviewRequests } from "./github/usePullRequests";
 import { closedUnreviewedQuery, pendingReviewQuery } from "./lib/searchQueries";
 import { groupByRepo, shortRepoName } from "./lib/groupByRepo";
@@ -9,13 +11,13 @@ import {
   checksAccessories,
   pullRequestStateIcon,
 } from "./components/accessories";
-import { getOrganization } from "./preferences";
+import { getSearchScope } from "./preferences";
 
-export default function ReviewRequests() {
-  const organization = getOrganization();
+function ReviewRequests() {
+  const scope = getSearchScope();
   const { data, isLoading, error, revalidate } = useReviewRequests(
-    pendingReviewQuery(organization),
-    closedUnreviewedQuery(new Date(), organization),
+    pendingReviewQuery(scope),
+    closedUnreviewedQuery(new Date(), scope),
   );
 
   if (error) {
@@ -57,3 +59,5 @@ export default function ReviewRequests() {
     </List>
   );
 }
+
+export default withAccessToken(github)(ReviewRequests);

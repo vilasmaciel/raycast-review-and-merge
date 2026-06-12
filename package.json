@@ -5,6 +5,7 @@
   "description": "Review and merge pull requests fast: list your PRs and review requests, approve, and merge or auto-merge in one click.",
   "icon": "extension-icon.png",
   "author": "fernando_vilas",
+  "categories": ["Developer Tools", "Productivity", "Applications"],
   "license": "MIT",
   "commands": [
     {
@@ -24,9 +25,9 @@
     {
       "name": "githubToken",
       "type": "password",
-      "required": true,
+      "required": false,
       "title": "GitHub Personal Access Token",
-      "description": "GitHub token with the `repo` scope and access to the repositories whose pull requests you want to see.",
+      "description": "Optional. Leave empty to sign in with GitHub (OAuth). To use a token instead, provide one with the `repo` scope and access to the repositories whose pull requests you want to see.",
       "placeholder": "ghp_…"
     },
     {
@@ -36,6 +37,14 @@
       "title": "Organization or Owner",
       "description": "Optional. Limit results to this GitHub org/owner. Leave empty to include all your pull requests across GitHub.",
       "placeholder": "my-org"
+    },
+    {
+      "name": "repositories",
+      "type": "textfield",
+      "required": false,
+      "title": "Repositories",
+      "description": "Optional. Limit results to specific repositories — a comma- or space-separated list of owner/repo (e.g. octocat/hello-world). Combines with the organization filter (results match any listed repo or org).",
+      "placeholder": "owner/repo, owner/repo"
     }
   ],
   "dependencies": {
@@ -55,6 +64,7 @@
     "dev": "ray develop",
     "lint": "ray lint",
     "fix-lint": "ray lint --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "publish": "npx @raycast/api@latest publish"
   }
 }

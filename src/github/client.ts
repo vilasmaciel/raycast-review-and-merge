@@ -1,8 +1,4 @@
-import { getPreferenceValues } from "@raycast/api";
-
-interface Preferences {
-  githubToken: string;
-}
+import { getAccessToken } from "@raycast/utils";
 
 export class GitHubError extends Error {
   constructor(
@@ -23,11 +19,11 @@ export async function githubGraphql<T>(
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<T> {
-  const { githubToken } = getPreferenceValues<Preferences>();
+  const { token } = getAccessToken();
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${githubToken}`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query, variables }),
