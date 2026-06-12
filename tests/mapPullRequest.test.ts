@@ -17,6 +17,7 @@ function node(overrides: Partial<PullRequestNode> = {}): PullRequestNode {
     reviewDecision: "REVIEW_REQUIRED",
     mergeStateStatus: "BLOCKED",
     autoMergeRequest: null,
+    comments: { totalCount: 3 },
     commits: { nodes: [{ commit: { statusCheckRollup: { state: "PENDING" } } }] },
     latestReviews: { nodes: [] },
     ...overrides,
@@ -44,6 +45,7 @@ describe("mapPullRequest", () => {
       checksState: "PENDING",
       autoMergeEnabled: false,
       viewerHasApproved: false,
+      comments: 3,
     });
   });
 

@@ -9,6 +9,8 @@ import { ErrorView } from "./components/ErrorView";
 import {
   autoMergeAccessories,
   checksAccessories,
+  commentsAccessories,
+  dateAccessories,
   pullRequestStateIcon,
   reviewDecisionAccessories,
 } from "./components/accessories";
@@ -46,6 +48,8 @@ function MyPullRequests() {
                 ...checksAccessories(pr),
                 ...autoMergeAccessories(pr),
                 ...reviewDecisionAccessories(pr),
+                ...commentsAccessories(pr),
+                ...dateAccessories(pr),
               ]}
             />
           ))}

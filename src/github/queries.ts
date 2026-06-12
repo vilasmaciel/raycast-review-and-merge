@@ -13,6 +13,7 @@ const PR_FIELDS = `
     reviewDecision
     mergeStateStatus
     autoMergeRequest { enabledAt }
+    comments { totalCount }
     commits(last: 1) { nodes { commit { statusCheckRollup { state } } } }
     latestReviews(first: 50) { nodes { author { login } state } }
   }

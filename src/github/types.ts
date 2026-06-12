@@ -33,6 +33,7 @@ export interface PullRequest {
   checksState: ChecksState;
   autoMergeEnabled: boolean;
   viewerHasApproved: boolean;
+  comments: number;
 }
 
 export interface PullRequestNode {
@@ -49,6 +50,7 @@ export interface PullRequestNode {
   reviewDecision: ReviewDecision;
   mergeStateStatus: MergeStateStatus;
   autoMergeRequest: { enabledAt: string } | null;
+  comments: { totalCount: number };
   commits: {
     nodes: Array<{
       commit: { statusCheckRollup: { state: ChecksState } | null };

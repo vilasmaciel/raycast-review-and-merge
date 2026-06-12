@@ -93,6 +93,25 @@ export function reviewDecisionAccessories(
   return [REVIEW_DECISION_ACCESSORY[pr.reviewDecision]];
 }
 
+/** Comment count with a speech-bubble icon (dimmed when there are none). */
+export function commentsAccessories(pr: PullRequest): List.Item.Accessory[] {
+  return [
+    {
+      icon: Icon.Bubble,
+      text: {
+        value: `${pr.comments}`,
+        color: pr.comments > 0 ? Color.PrimaryText : Color.SecondaryText,
+      },
+      tooltip: `${pr.comments} ${pr.comments === 1 ? "comment" : "comments"}`,
+    },
+  ];
+}
+
+/** Relative "last updated" date. */
+export function dateAccessories(pr: PullRequest): List.Item.Accessory[] {
+  return [{ date: new Date(pr.updatedAt), tooltip: "Last updated" }];
+}
+
 export function authorAccessory(pr: PullRequest): List.Item.Accessory {
   return {
     icon: pr.authorAvatarUrl

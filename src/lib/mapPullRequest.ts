@@ -25,5 +25,6 @@ export function mapPullRequest(
       (review) =>
         review.author?.login === viewerLogin && review.state === "APPROVED",
     ),
+    comments: node.comments.totalCount,
   };
 }
