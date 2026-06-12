@@ -9,7 +9,7 @@ const PR_FIELDS = `
     updatedAt
     headRefName
     author { login avatarUrl }
-    repository { nameWithOwner viewerDefaultMergeMethod }
+    repository { nameWithOwner viewerDefaultMergeMethod autoMergeAllowed }
     reviewDecision
     mergeStateStatus
     autoMergeRequest { enabledAt }
