@@ -1,62 +1,30 @@
-import { Icon, Image, MenuBarExtra, open } from "@raycast/api";
+import { Clipboard, Icon, MenuBarExtra, open } from "@raycast/api";
 import { PullRequest } from "../github/types";
+import { DISABLE_AUTO_MERGE } from "../github/queries";
+import { runMutation } from "../github/runMutation";
 import { approvePullRequest } from "../github/approvePullRequest";
 import { confirmAndMerge } from "../github/mergePullRequest";
 import { enableAutoMerge } from "../github/enableAutoMerge";
 import { shortRepoName } from "../lib/groupByRepo";
 import { menuBarStatusLine } from "../lib/menuBarStatus";
 import {
-  MenuBarAction,
   MenuBarSection,
   menuBarPrimaryAction,
 } from "../lib/menuBarPrimaryAction";
+import { pullRequestStatus } from "./accessories";
+
+/** Max length of the PR title shown on the (single-line) menu row. */
+const MAX_TITLE = 36;
+
+function truncate(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+}
 
 interface Props {
   pr: PullRequest;
   section: MenuBarSection;
   viewerLogin: string | undefined;
   onRefresh: () => void;
-}
-
-interface ActionView {
-  icon: Image.ImageLike;
-  tooltip: string;
-  run: () => void;
-}
-
-/** Icon, tooltip, and handler for the row's one-click smart action. */
-function actionView(
-  action: MenuBarAction,
-  pr: PullRequest,
-  onRefresh: () => void,
-): ActionView {
-  const label = `${shortRepoName(pr.repo)} #${pr.number}`;
-  switch (action) {
-    case "approve":
-      return {
-        icon: Icon.CheckCircle,
-        tooltip: `Approve ${label}`,
-        run: () => approvePullRequest(pr, onRefresh),
-      };
-    case "merge":
-      return {
-        icon: Icon.ArrowDownCircle,
-        tooltip: `Merge ${label}`,
-        run: () => confirmAndMerge(pr, onRefresh),
-      };
-    case "enable-auto-merge":
-      return {
-        icon: Icon.Bolt,
-        tooltip: `Enable auto-merge on ${label}`,
-        run: () => enableAutoMerge(pr, onRefresh),
-      };
-    case "open":
-      return {
-        icon: Icon.Globe,
-        tooltip: `Open ${label} in browser`,
-        run: () => open(pr.url),
-      };
-  }
 }
 
 export function PullRequestMenuItem({
@@ -66,28 +34,76 @@ export function PullRequestMenuItem({
   onRefresh,
 }: Props) {
   const action = menuBarPrimaryAction(pr, section, viewerLogin);
-  const primary = actionView(action, pr, onRefresh);
-  const repo = `${shortRepoName(pr.repo)} #${pr.number}`;
+  const status = pullRequestStatus(pr);
   const statusLine = menuBarStatusLine(pr);
-  const subtitle = statusLine ? `${repo} · ${statusLine}` : repo;
+  const title = `${shortRepoName(pr.repo)} #${pr.number} · ${truncate(pr.title, MAX_TITLE)}`;
 
   return (
-    <MenuBarExtra.Item
-      title={pr.title}
-      subtitle={subtitle}
-      icon={primary.icon}
-      tooltip={primary.tooltip}
-      onAction={primary.run}
-      alternate={
-        action === "open" ? undefined : (
+    <MenuBarExtra.Submenu title={title} icon={status.icon}>
+      <MenuBarExtra.Section title={statusLine || undefined}>
+        {action === "approve" && (
           <MenuBarExtra.Item
-            title={pr.title}
-            subtitle={`Open ${repo} in browser`}
+            title="Approve"
+            icon={Icon.CheckCircle}
+            onAction={() => approvePullRequest(pr, onRefresh)}
+          />
+        )}
+        {action === "merge" && (
+          <MenuBarExtra.Item
+            title="Merge"
+            icon={Icon.ArrowDownCircle}
+            onAction={() => confirmAndMerge(pr, onRefresh)}
+          />
+        )}
+        {action === "enable-auto-merge" && (
+          <MenuBarExtra.Item
+            title="Enable Auto-Merge"
+            icon={Icon.Bolt}
+            onAction={() => enableAutoMerge(pr, onRefresh)}
+          />
+        )}
+        {action === "open" && (
+          <MenuBarExtra.Item
+            title="Open in Browser"
             icon={Icon.Globe}
             onAction={() => open(pr.url)}
           />
-        )
-      }
-    />
+        )}
+      </MenuBarExtra.Section>
+      <MenuBarExtra.Section>
+        {action !== "open" && (
+          <MenuBarExtra.Item
+            title="Open in Browser"
+            icon={Icon.Globe}
+            onAction={() => open(pr.url)}
+          />
+        )}
+        <MenuBarExtra.Item
+          title="Copy URL"
+          icon={Icon.Link}
+          onAction={() => Clipboard.copy(pr.url)}
+        />
+        <MenuBarExtra.Item
+          title="Copy Branch Name"
+          icon={Icon.Clipboard}
+          onAction={() => Clipboard.copy(pr.headRefName)}
+        />
+        {pr.autoMergeEnabled && (
+          <MenuBarExtra.Item
+            title="Disable Auto-Merge"
+            icon={Icon.BoltDisabled}
+            onAction={() =>
+              runMutation(
+                "Disabling auto-merge…",
+                `Auto-merge disabled on ${pr.repo}#${pr.number}`,
+                DISABLE_AUTO_MERGE,
+                { prId: pr.id },
+                onRefresh,
+              )
+            }
+          />
+        )}
+      </MenuBarExtra.Section>
+    </MenuBarExtra.Submenu>
   );
 }
