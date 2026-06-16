@@ -1,4 +1,10 @@
-import { Icon, LaunchType, MenuBarExtra, launchCommand } from "@raycast/api";
+import {
+  Color,
+  Icon,
+  LaunchType,
+  MenuBarExtra,
+  launchCommand,
+} from "@raycast/api";
 import { withAccessToken } from "@raycast/utils";
 import { github } from "./github/auth";
 import {
@@ -36,7 +42,10 @@ function PullRequestsMenuBar() {
 
   return (
     <MenuBarExtra
-      icon={{ source: "pull-request-open.svg" }}
+      icon={{
+        source: "pull-request-open.svg",
+        tintColor: Color.PrimaryText,
+      }}
       title={title}
       tooltip={tooltip}
       isLoading={isLoading}
