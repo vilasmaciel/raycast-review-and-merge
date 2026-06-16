@@ -4,7 +4,10 @@ import { APPROVE_PULL_REQUEST } from "./queries";
 import { PullRequest } from "./types";
 
 /** Submit an APPROVE review for a PR, with progress/success/failure toasts. */
-export async function approvePullRequest(pr: PullRequest, onRefresh: () => void) {
+export async function approvePullRequest(
+  pr: PullRequest,
+  onRefresh: () => void,
+) {
   const toast = await showToast({
     style: Toast.Style.Animated,
     title: "Approving…",

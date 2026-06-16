@@ -100,9 +100,12 @@ function PullRequestsMenuBar() {
         </MenuBarExtra.Section>
       )}
 
-      {!isLoading && !hasError && toReview.length === 0 && myPrs.length === 0 && (
-        <MenuBarExtra.Item title="No pull requests" icon={Icon.Check} />
-      )}
+      {!isLoading &&
+        !hasError &&
+        toReview.length === 0 &&
+        myPrs.length === 0 && (
+          <MenuBarExtra.Item title="No pull requests" icon={Icon.Check} />
+        )}
 
       <MenuBarExtra.Section>
         <MenuBarExtra.Item

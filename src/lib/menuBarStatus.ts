@@ -14,6 +14,7 @@ export function menuBarStatusLine(pr: PullRequest): string {
   if (pr.isDraft) parts.push("draft");
   if (pr.checksState) parts.push(`checks ${CHECKS_GLYPH[pr.checksState]}`);
   if (pr.reviewDecision === "APPROVED") parts.push("approved");
-  else if (pr.reviewDecision === "CHANGES_REQUESTED") parts.push("changes requested");
+  else if (pr.reviewDecision === "CHANGES_REQUESTED")
+    parts.push("changes requested");
   return parts.join(" · ");
 }
