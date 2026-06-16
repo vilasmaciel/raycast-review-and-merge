@@ -20,7 +20,7 @@ export function menuBarTitle(
     (pr) => primaryMergeAction(pr) === "merge",
   ).length;
   return {
-    title: reviewCount > 0 ? String(reviewCount) : undefined,
+    title: reviewCount > 0 ? `● ${reviewCount}` : undefined,
     tooltip: `${reviewCount} to review · ${readyCount} of mine ready to merge`,
   };
 }

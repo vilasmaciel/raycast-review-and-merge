@@ -19,12 +19,12 @@ describe("menuBarTitle", () => {
     expect(result.tooltip).toBe("0 to review · 0 of mine ready to merge");
   });
 
-  it("counts review requests in the badge and ready-to-merge PRs in the tooltip", () => {
+  it("counts review requests in the badge (with a dot) and ready-to-merge PRs in the tooltip", () => {
     const result = menuBarTitle(
       [pr(), pr()],
       [pr({ mergeStateStatus: "CLEAN" }), pr({ mergeStateStatus: "BLOCKED" })],
     );
-    expect(result.title).toBe("2");
+    expect(result.title).toBe("● 2");
     expect(result.tooltip).toBe("2 to review · 1 of mine ready to merge");
   });
 });

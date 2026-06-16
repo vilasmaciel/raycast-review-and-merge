@@ -44,7 +44,7 @@ function PullRequestsMenuBar() {
     <MenuBarExtra
       icon={{
         source: "pull-request-open.svg",
-        tintColor: Color.PrimaryText,
+        tintColor: toReview.length > 0 ? Color.Yellow : Color.PrimaryText,
       }}
       title={title}
       tooltip={tooltip}
