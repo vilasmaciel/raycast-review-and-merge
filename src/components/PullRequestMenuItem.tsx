@@ -25,6 +25,8 @@ interface Props {
   section: MenuBarSection;
   viewerLogin: string | undefined;
   onRefresh: () => void;
+  /** Called after an action that removes the PR from its list (approve/merge). */
+  onResolved: (id: string) => void;
 }
 
 export function PullRequestMenuItem({
@@ -32,11 +34,18 @@ export function PullRequestMenuItem({
   section,
   viewerLogin,
   onRefresh,
+  onResolved,
 }: Props) {
   const action = menuBarPrimaryAction(pr, section, viewerLogin);
   const status = pullRequestStatus(pr);
   const statusLine = menuBarStatusLine(pr);
   const title = `${shortRepoName(pr.repo)} #${pr.number} · ${truncate(pr.title, MAX_TITLE)}`;
+
+  // Optimistically drop the row on success, then revalidate to reconcile.
+  const resolveAndRefresh = () => {
+    onResolved(pr.id);
+    onRefresh();
+  };
 
   return (
     <MenuBarExtra.Submenu title={title} icon={status.icon}>
@@ -45,14 +54,14 @@ export function PullRequestMenuItem({
           <MenuBarExtra.Item
             title="Approve"
             icon={Icon.CheckCircle}
-            onAction={() => approvePullRequest(pr, onRefresh)}
+            onAction={() => approvePullRequest(pr, resolveAndRefresh)}
           />
         )}
         {action === "merge" && (
           <MenuBarExtra.Item
             title="Merge"
             icon={Icon.ArrowDownCircle}
-            onAction={() => confirmAndMerge(pr, onRefresh)}
+            onAction={() => confirmAndMerge(pr, resolveAndRefresh)}
           />
         )}
         {action === "enable-auto-merge" && (

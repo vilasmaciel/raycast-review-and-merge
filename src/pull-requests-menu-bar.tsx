@@ -5,6 +5,7 @@ import {
   MenuBarExtra,
   launchCommand,
 } from "@raycast/api";
+import { useState } from "react";
 import { withAccessToken } from "@raycast/utils";
 import { github } from "./github/auth";
 import {
@@ -28,8 +29,19 @@ function PullRequestsMenuBar() {
   );
   const mine = usePullRequestSearch(myOpenPullRequestsQuery(scope));
 
-  const toReview = review.data?.pending ?? [];
-  const myPrs = mine.data?.pullRequests ?? [];
+  // PRs acted on this session (approved/merged). GitHub's search index lags a
+  // few seconds, so we hide them optimistically instead of waiting for the
+  // re-fetch to drop them. Resets on the next background launch (re-mount).
+  const [resolved, setResolved] = useState<string[]>([]);
+  const resolve = (id: string) =>
+    setResolved((ids) => (ids.includes(id) ? ids : [...ids, id]));
+
+  const toReview = (review.data?.pending ?? []).filter(
+    (pr) => !resolved.includes(pr.id),
+  );
+  const myPrs = (mine.data?.pullRequests ?? []).filter(
+    (pr) => !resolved.includes(pr.id),
+  );
   const viewerLogin = review.data?.viewerLogin ?? mine.data?.viewerLogin;
   const isLoading = review.isLoading || mine.isLoading;
   const hasError = Boolean(review.error || mine.error);
@@ -67,6 +79,7 @@ function PullRequestsMenuBar() {
               section="review"
               viewerLogin={viewerLogin}
               onRefresh={onRefresh}
+              onResolved={resolve}
             />
           ))}
         </MenuBarExtra.Section>
@@ -81,6 +94,7 @@ function PullRequestsMenuBar() {
               section="mine"
               viewerLogin={viewerLogin}
               onRefresh={onRefresh}
+              onResolved={resolve}
             />
           ))}
         </MenuBarExtra.Section>
