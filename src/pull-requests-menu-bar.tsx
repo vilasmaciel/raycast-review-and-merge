@@ -20,6 +20,17 @@ import {
 import { getSearchScope } from "./preferences";
 import { menuBarTitle } from "./lib/menuBarTitle";
 import { PullRequestMenuItem } from "./components/PullRequestMenuItem";
+import { PullRequest } from "./github/types";
+
+/** PRs still awaiting the viewer's review: not yet reviewed and not resolved this session. */
+function awaitingReview(
+  prs: PullRequest[],
+  resolvedIds: string[],
+): PullRequest[] {
+  return prs.filter(
+    (pr) => !pr.viewerHasReviewed && !resolvedIds.includes(pr.id),
+  );
+}
 
 function PullRequestsMenuBar() {
   const scope = getSearchScope();
@@ -36,9 +47,7 @@ function PullRequestsMenuBar() {
   const resolve = (id: string) =>
     setResolved((ids) => (ids.includes(id) ? ids : [...ids, id]));
 
-  const toReview = (review.data?.pending ?? []).filter(
-    (pr) => !resolved.includes(pr.id),
-  );
+  const toReview = awaitingReview(review.data?.pending ?? [], resolved);
   const myPrs = (mine.data?.pullRequests ?? []).filter(
     (pr) => !resolved.includes(pr.id),
   );

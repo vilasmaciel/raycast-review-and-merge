@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildReviewers,
+  hasReviewed,
   ReviewNode,
   ReviewRequestNode,
 } from "../src/lib/reviewers";
@@ -83,5 +84,33 @@ describe("buildReviewers", () => {
       ],
     );
     expect(reviewers).toEqual([]);
+  });
+});
+
+describe("hasReviewed", () => {
+  it("is true once the viewer reviewed, even if a team request lingers", () => {
+    expect(
+      hasReviewed([teamRequest("Insights")], [review("octocat", "APPROVED")], "octocat"),
+    ).toBe(true);
+  });
+
+  it("counts changes-requested and commented reviews as done", () => {
+    expect(hasReviewed([], [review("octocat", "CHANGES_REQUESTED")], "octocat")).toBe(true);
+    expect(hasReviewed([], [review("octocat", "COMMENTED")], "octocat")).toBe(true);
+  });
+
+  it("is false when the viewer has not reviewed", () => {
+    expect(hasReviewed([teamRequest("Insights")], [], "octocat")).toBe(false);
+    expect(hasReviewed([], [review("alice", "APPROVED")], "octocat")).toBe(false);
+  });
+
+  it("is false when the viewer is individually re-requested after reviewing", () => {
+    expect(
+      hasReviewed([userRequest("octocat")], [review("octocat", "APPROVED")], "octocat"),
+    ).toBe(false);
+  });
+
+  it("is false when the viewer's review was dismissed", () => {
+    expect(hasReviewed([], [review("octocat", "DISMISSED")], "octocat")).toBe(false);
   });
 });

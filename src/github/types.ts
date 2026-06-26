@@ -35,6 +35,12 @@ export interface PullRequest {
   autoMergeEnabled: boolean;
   autoMergeAllowed: boolean;
   viewerHasApproved: boolean;
+  /**
+   * True when the viewer has already reviewed and the PR is no longer pending
+   * on them (their review stands and they have not been re-requested). Used to
+   * drop PRs the viewer can no longer act on from the review list.
+   */
+  viewerHasReviewed: boolean;
   comments: number;
   /** Requested reviewers (pending) plus those who have already reviewed. */
   reviewers: Reviewer[];

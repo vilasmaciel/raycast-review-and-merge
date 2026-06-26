@@ -85,3 +85,28 @@ export function buildReviewers(
 
   return reviewers;
 }
+
+/**
+ * Whether `login` has already submitted a review that still stands and is not
+ * being asked for again — i.e. the viewer has no pending action on the PR. A
+ * lingering *team* review request (common on Dependabot PRs: GitHub leaves the
+ * team requested even after a member approves) does NOT keep it pending, since
+ * the member already did their part. An individual re-request, or a dismissed
+ * review, means they must review again, so this returns false.
+ */
+export function hasReviewed(
+  reviewRequests: ReviewRequestNode[],
+  latestReviews: ReviewNode[],
+  login: string,
+): boolean {
+  const reRequested = reviewRequests.some(
+    ({ requestedReviewer }) =>
+      requestedReviewer?.__typename !== "Team" &&
+      requestedReviewer?.login === login,
+  );
+  if (reRequested) return false;
+  return latestReviews.some(
+    ({ author, state }) =>
+      author?.login === login && REVIEW_STATE_TO_STATUS[state] !== undefined,
+  );
+}

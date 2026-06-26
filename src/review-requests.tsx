@@ -26,10 +26,11 @@ function ReviewRequests() {
     return <ErrorView error={error} onRetry={revalidate} />;
   }
 
-  const groups = groupByRepo([
-    ...(data?.pending ?? []),
-    ...(data?.closed ?? []),
-  ]);
+  const groups = groupByRepo(
+    [...(data?.pending ?? []), ...(data?.closed ?? [])].filter(
+      (pr) => !pr.viewerHasReviewed,
+    ),
+  );
 
   return (
     <List isLoading={isLoading} searchBarPlaceholder="Filter review requests…">

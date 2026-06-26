@@ -51,9 +51,58 @@ describe("mapPullRequest", () => {
       autoMergeEnabled: false,
       autoMergeAllowed: true,
       viewerHasApproved: false,
+      viewerHasReviewed: false,
       comments: 3,
       reviewers: [],
     });
+  });
+
+  it("flags a PR the viewer already reviewed with only a lingering team request", () => {
+    const pr = mapPullRequest(
+      node({
+        reviewRequests: {
+          nodes: [{ requestedReviewer: { __typename: "Team", name: "Insights" } }],
+        },
+        latestReviews: {
+          nodes: [
+            {
+              author: { login: "octocat", avatarUrl: "https://avatars/octocat.png" },
+              state: "APPROVED",
+            },
+          ],
+        },
+      }),
+      "octocat",
+    );
+    expect(pr.viewerHasReviewed).toBe(true);
+  });
+
+  it("keeps the PR actionable when the viewer is re-requested after reviewing", () => {
+    const pr = mapPullRequest(
+      node({
+        reviewRequests: {
+          nodes: [
+            {
+              requestedReviewer: {
+                __typename: "User",
+                login: "octocat",
+                avatarUrl: "https://avatars/octocat.png",
+              },
+            },
+          ],
+        },
+        latestReviews: {
+          nodes: [
+            {
+              author: { login: "octocat", avatarUrl: "https://avatars/octocat.png" },
+              state: "APPROVED",
+            },
+          ],
+        },
+      }),
+      "octocat",
+    );
+    expect(pr.viewerHasReviewed).toBe(false);
   });
 
   it("detects an existing APPROVED review by the viewer", () => {
